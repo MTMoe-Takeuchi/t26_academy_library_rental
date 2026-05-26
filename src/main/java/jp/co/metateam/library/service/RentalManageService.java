@@ -45,12 +45,10 @@ public class RentalManageService {
         LocalDate rentalDate = rentalManageDto.getExpectedRentalOn();
         LocalDate returnDate = rentalManageDto.getExpectedReturnOn();
 
-        // 貸出予定日 ＜ 返却予定日 のチェック
-        if (rentalDate.isAfter(returnDate)) {
-            result.rejectValue("expectedReturnOn", "error.expectedReturnOn", "返却日は貸出日より後にしてください");
+        // 貸出予定日 ≦ 返却予定日 のチェック
+        if (rentalDate.isAfter(returnDate) || rentalDate.isEqual(returnDate)) {
+            result.rejectValue("expectedReturnOn", "error.expectedReturnOn", "返却日は貸出日より後の日付（次の日以降）にしてください");
         }
-
-        // 日付と貸出ステータスの矛盾チェック
 
         // 対象書籍の在庫ステータスが「貸出可(0)」かチェック
         if (stock.getStatus() != 0) {
@@ -60,12 +58,10 @@ public class RentalManageService {
         // 既存データとの期間重複チェック
         Boolean overlapping = rentalManageRepository.existsOverlappingRental(
                 rentalManageDto.getStockId(), rentalDate, returnDate);
-
         if (Boolean.TRUE.equals(overlapping)) {
-            result.rejectValue("expectedRentalOn", "error", "この期間は既に予約があります");
-            result.rejectValue("expectedReturnOn", "error", "この期間は既に予約があります");
+            result.rejectValue("expectedRentalOn", "error.expectedRentalOn", "この期間は既に予約があります");
+            result.rejectValue("expectedReturnOn", "error.expectedReturnOn", "この期間は既に予約があります");
         }
-
 
         // エラーが1つでもあれば保存せずに戻る
         if (result.hasErrors())
@@ -90,5 +86,4 @@ public class RentalManageService {
     public List<RentalManage> findAll() {
         return this.rentalManageRepository.findAll();
     }
-
 }

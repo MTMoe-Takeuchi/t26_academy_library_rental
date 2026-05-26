@@ -88,8 +88,6 @@ public class RentalManageController {
         // Serviceで保存処理とエラーチェックを実行
         this.rentalManageService.save(rentalManageDto, result);
 
-        //
-
         // もしエラーが1つでもあれば登録画面に戻す
         if (result.hasErrors()) {
             // 画面に戻す際、プルダウンに再度データを渡す
@@ -98,7 +96,6 @@ public class RentalManageController {
             model.addAttribute("rentalStatus", RentalStatus.values());
             return "rental/add";
         }
-
         if (rentalManageDto.getExpectedRentalOn() != null
                 && rentalManageDto.getExpectedReturnOn() != null
                 && rentalManageDto.getExpectedRentalOn().isEqual(rentalManageDto.getExpectedReturnOn())) {
@@ -110,5 +107,4 @@ public class RentalManageController {
         redirectAttributes.addFlashAttribute("successMessage", "貸出情報を登録しました");
         return "redirect:/rental/index";
     }
-
 }
